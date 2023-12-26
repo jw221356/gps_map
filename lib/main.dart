@@ -40,11 +40,7 @@ class GpsMapAppState extends State<GpsMapApp> {
     zoom: 14.4746,
   );
 
-  static const CameraPosition _kLake = CameraPosition(
-      bearing: 192.8334901395799,
-      target: LatLng(37.43296265331129, -122.08832357078792),
-      tilt: 59.440717697143555,
-      zoom: 19.151926040649414);
+  CameraPosition? _initialCameraPosition;
 
   @override
   void initState() {
@@ -56,15 +52,23 @@ class GpsMapAppState extends State<GpsMapApp> {
   Future<void> init() async {
     final position = await _determinePosition();
 
-    print(position.toString());
+    _initialCameraPosition = CameraPosition(
+        target: LatLng(position.latitude, position.longitude),
+      zoom: 17,
+    );
+
+    setState(() {});
+
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GoogleMap(
+      body: _initialCameraPosition == null
+      ? const Center(child: CircularProgressIndicator())
+      : GoogleMap(
         mapType: MapType.normal,
-        initialCameraPosition: _kGooglePlex,
+        initialCameraPosition: _initialCameraPosition!,
         onMapCreated: (GoogleMapController controller) {
           _controller.complete(controller);
         },
